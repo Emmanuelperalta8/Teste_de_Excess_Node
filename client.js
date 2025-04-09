@@ -1,36 +1,29 @@
 const axios = require("axios");
 
-const BASE_URL = "http://localhost:3000";
-const endpoints = ["/", "/excecao", "/demorado"];
-const TOTAL_POR_ENDPOINT = 2000;
+const baseUrl = "http://localhost:3000";
+const rotas = ["/", "/excecao", "/demorado"];
+const totalRequisicoes = 30;
 
-// Função que mede o tempo de uma requisição
-async function testarEndpoint(endpoint, index) {
-    const url = `${BASE_URL}${endpoint}`;
+async function fazerRequisicoes(rota) {
     const inicio = Date.now();
-    try {
-        const resposta = await axios.get(url);
-        const duracao = Date.now() - inicio;
-        console.log(`✅ [${endpoint} #${index}] - ${resposta.status} (${duracao}ms)`);
-    } catch (erro) {
-        const duracao = Date.now() - inicio;
-        const status = erro.response?.status || "SEM RESPOSTA";
-        console.log(`❌ [${endpoint} #${index}] - ERRO ${status} (${duracao}ms) - ${erro.message}`);
-    }
-}
+    console.log(`\n🔁 Testando ${totalRequisicoes} requisições para ${baseUrl + rota}`);
 
-// Dispara 10 requisições para cada rota em paralelo
-async function testarTodos() {
-    const todasRequisicoes = [];
-
-    endpoints.forEach(endpoint => {
-        for (let i = 1; i <= TOTAL_POR_ENDPOINT; i++) {
-            todasRequisicoes.push(testarEndpoint(endpoint, i));
+    for (let i = 0; i < totalRequisicoes; i++) {
+        try {
+            const resposta = await axios.get(baseUrl + rota);
+            console.log(`✅ ${i + 1}/${totalRequisicoes} - ${resposta.status}`);
+        } catch (erro) {
+            console.log(`❌ ${i + 1}/${totalRequisicoes} - Erro: ${erro.response?.status || erro.message}`);
         }
-    });
+    }
 
-    await Promise.allSettled(todasRequisicoes);
-    console.log("✅ Todos os testes concluídos.");
+    const fim = Date.now();
+    const tempoTotal = ((fim - inicio) / 1000).toFixed(2);
+    console.log(`⏱️ Tempo total (${rota}): ${tempoTotal} segundos`);
 }
 
-testarTodos();
+(async () => {
+    for (const rota of rotas) {
+        await fazerRequisicoes(rota);
+    }
+})();

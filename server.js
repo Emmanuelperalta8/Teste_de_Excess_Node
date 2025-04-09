@@ -5,14 +5,14 @@ app.get("/", (req, res) => {
     res.send("Página inicial");
 });
 
-app.get("/excecao", (req, res) => {
-    throw new Error("Erro gerado propositalmente!");
-});
-
 app.get("/demorado", (req, res) => {
     setTimeout(() => {
         res.send("Resposta após 60 segundos");
-    }, 60000);
+    }, 60000); // 60 segundos
+});
+
+app.get("/excecao", (req, res) => {
+    throw new Error("Erro gerado propositalmente!");
 });
 
 app.use((err, req, res, next) => {
